@@ -5,8 +5,8 @@ package cmd
 
 import (
 	"absgo/api"
+	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -24,6 +24,12 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		type DataflowStruct struct {
+			Id          string `json:"id"`
+			Name        string `json:"name"`
+			Description string `json:"description"`
+		}
 
 		client := &http.Client{}
 
@@ -46,13 +52,21 @@ to quickly create a Cobra application.`,
 		defer response.Body.Close()
 
 		if response.StatusCode == http.StatusOK {
-			bodyBytes, err := io.ReadAll(response.Body)
-			if err != nil {
-				log.Fatal(err)
+			// bodyBytes, err := io.ReadAll(response.Body)
+			// if err != nil {
+			// 	log.Fatal(err)
+			// }
+
+			dataflowItem := DataflowStruct{}
+
+			decoder := json.NewDecoder(response.Body)
+			decoder.DisallowUnknownFields()
+
+			if decoder.Decode(&dataflowItem); err != nil {
+				log.Fatal("decode error:", err)
 			}
 
-			data := string(bodyBytes)
-			fmt.Println(data)
+			fmt.Printf("data from API: %+v", dataflowItem)
 		}
 	},
 }
