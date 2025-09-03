@@ -7,6 +7,7 @@ import (
 	"absgo/api"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -31,9 +32,17 @@ to quickly create a Cobra application.`,
 			Description string `json:"description"`
 		}
 
+		type Data struct {
+			Dataflows []DataflowStruct `json:"dataflows"`
+		}
+
+		type Root struct {
+			Data Data `json:"data"`
+		}
+
 		client := &http.Client{}
 
-		fmt.Println("ListDataflow called")
+		// fmt.Println("ListDataflow called")
 
 		getURL := api.Base_url + api.DataflowURL
 
@@ -52,21 +61,18 @@ to quickly create a Cobra application.`,
 		defer response.Body.Close()
 
 		if response.StatusCode == http.StatusOK {
-			// bodyBytes, err := io.ReadAll(response.Body)
-			// if err != nil {
-			// 	log.Fatal(err)
-			// }
-
-			dataflowItem := DataflowStruct{}
-
-			decoder := json.NewDecoder(response.Body)
-			decoder.DisallowUnknownFields()
-
-			if decoder.Decode(&dataflowItem); err != nil {
-				log.Fatal("decode error:", err)
+			bodyBytes, err := io.ReadAll(response.Body)
+			if err != nil {
+				log.Fatal(err)
 			}
 
-			fmt.Printf("data from API: %+v", dataflowItem)
+			var root Root
+
+			json.Unmarshal([]byte(bodyBytes), &root)
+
+			for _, df := range root.Data.Dataflows {
+				fmt.Println(df.Id, ",", df.Name)
+			}
 		}
 	},
 }
