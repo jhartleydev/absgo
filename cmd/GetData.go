@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"absgo/api"
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -30,8 +32,12 @@ to quickly create a Cobra application.`,
 			log.Fatal("no header")
 		} else if structureID == "" {
 			log.Fatal("no structure ID")
-		} else {
-			getData(headerType, structureID)
+		} else if headerType == "CSVHeader" {
+			getCSVData(headerType, structureID)
+		} else if headerType == "CSVLabelHeader" {
+			getCSVData(headerType, structureID)
+		} else if headerType == "JSONHeader" {
+			getJSONData(headerType, structureID)
 		}
 	},
 }
@@ -50,7 +56,7 @@ var Headers = map[string]string{
 	"CSVLabelHeader":     api.CSVLabelHeader,
 }
 
-func getData(headerType string, structureID string) {
+func getJSONData(headerType string, structureID string) {
 	client := &http.Client{}
 
 	header := Headers[headerType]
@@ -58,6 +64,8 @@ func getData(headerType string, structureID string) {
 	dataFlowId := structureID
 
 	getURL := api.Base_url + api.DataURL + "," + dataFlowId + ",1.0.0"
+
+	//fmt.Println(getURL)
 
 	req, err := http.NewRequest("GET", getURL, nil)
 	if err != nil {
@@ -75,36 +83,57 @@ func getData(headerType string, structureID string) {
 
 	// create structs for JSON responses
 	if response.StatusCode == http.StatusOK {
-		if header == "CSVHeader" || header == "CSVLabelHeader" {
-			bodyBytes, err := io.ReadAll(response.Body)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			println(bodyBytes)
-
-			myString := string(bodyBytes[:])
-
-			println(myString)
-		} else if header == "JSONHeader" {
-			println("json not ready")
-		} else {
-			println("do nothing")
+		bodyBytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		// var root Root
+		var result interface{}
 
-		// json.Unmarshal([]byte(bodyBytes), &root)
+		json.Unmarshal(bodyBytes, &result)
 
-		// dataflows := root.Data.Dataflows
+		fmt.Println(result)
 
-		// filteredDataflow := filterDataflow(dataflows, func(d DataflowStruct) bool {
-		// 	return d.Id == descTerm
-		// })
-		// fmt.Println(filteredDataflow)
+		myString := string(bodyBytes[:])
+		fmt.Println(myString)
+	}
+}
 
-		// for _, df := range root.Data.Dataflows {
-		// 	fmt.Println(df.Id, ",", df.Name)
-		// }
+func getCSVData(headerType string, structureID string) {
+	client := &http.Client{}
+
+	header := Headers[headerType]
+
+	dataFlowId := structureID
+
+	getURL := api.Base_url + api.DataURL + "," + dataFlowId + ",1.0.0"
+
+	//fmt.Println(getURL)
+
+	req, err := http.NewRequest("GET", getURL, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req.Header.Set("Accept", header)
+
+	response, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer response.Body.Close()
+
+	// create structs for JSON responses
+	if response.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(bodyBytes)
+
+		myString := string(bodyBytes[:])
+		fmt.Println(myString)
 	}
 }

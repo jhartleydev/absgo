@@ -4,7 +4,7 @@ var Base_url string = "https://data.api.abs.gov.au/"
 
 var DataflowURL string = "rest/dataflow/"
 
-var DataURL string = "rest/data/ABS"
+var DataURL string = "rest/data/ABS,"
 
 var DataflowHeader string = "application/vnd.sdmx.structure+json"
 
