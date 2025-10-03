@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -27,15 +28,18 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		headerType, _ := cmd.Flags().GetString("header")
 		structureID, _ := cmd.Flags().GetString("structureID")
+		filename, _ := cmd.Flags().GetString("filename")
 
 		if headerType == "" {
 			log.Fatal("no header")
 		} else if structureID == "" {
 			log.Fatal("no structure ID")
-		} else if headerType == "CSVHeader" {
-			getCSVData(headerType, structureID)
-		} else if headerType == "CSVLabelHeader" {
-			getCSVData(headerType, structureID)
+		} else if headerType[0:3] == "CSV" {
+			csvbytes := getCSVData(headerType, structureID)
+			if filename != "" {
+				os.WriteFile(filename+".csv", csvbytes, 0644)
+				fmt.Printf("outputting %s.csv to file...", filename)
+			}
 		} else if headerType == "JSONHeader" {
 			getJSONData(headerType, structureID)
 		}
@@ -47,6 +51,7 @@ func init() {
 
 	GetDataCmd.PersistentFlags().String("header", "", "add a header to the get request")
 	GetDataCmd.PersistentFlags().String("structureID", "", "add a structure ID to the request")
+	GetDataCmd.PersistentFlags().String("filename", "", "output to file")
 }
 
 var Headers = map[string]string{
@@ -64,8 +69,6 @@ func getJSONData(headerType string, structureID string) {
 	dataFlowId := structureID
 
 	getURL := api.Base_url + api.DataURL + "," + dataFlowId + ",1.0.0"
-
-	//fmt.Println(getURL)
 
 	req, err := http.NewRequest("GET", getURL, nil)
 	if err != nil {
@@ -99,16 +102,14 @@ func getJSONData(headerType string, structureID string) {
 	}
 }
 
-func getCSVData(headerType string, structureID string) {
+func getCSVData(headerType string, structureID string) []byte {
 	client := &http.Client{}
 
-	header := Headers[headerType]
+	var header string = Headers[headerType]
 
-	dataFlowId := structureID
+	var getURL string = api.Base_url + api.DataURL + "," + structureID + ",1.0.0"
 
-	getURL := api.Base_url + api.DataURL + "," + dataFlowId + ",1.0.0"
-
-	//fmt.Println(getURL)
+	fmt.Println(getURL)
 
 	req, err := http.NewRequest("GET", getURL, nil)
 	if err != nil {
@@ -124,16 +125,18 @@ func getCSVData(headerType string, structureID string) {
 
 	defer response.Body.Close()
 
+	var bodyBytes []byte
+
 	// create structs for JSON responses
 	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
+		bodyBytes, err = io.ReadAll(response.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		fmt.Println(bodyBytes)
-
 		myString := string(bodyBytes[:])
 		fmt.Println(myString)
+
 	}
+	return bodyBytes
 }
