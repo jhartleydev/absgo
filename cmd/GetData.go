@@ -38,10 +38,15 @@ to quickly create a Cobra application.`,
 			csvbytes := getCSVData(headerType, structureID)
 			if filename != "" {
 				os.WriteFile(filename+".csv", csvbytes, 0644)
-				fmt.Printf("outputting %s.csv to file...", filename)
+				fmt.Printf("outputting %s.csv to file...\n", filename)
 			}
 		} else if headerType == "JSONHeader" {
-			getJSONData(headerType, structureID)
+			jsoninterface := getJSONData(headerType, structureID)
+			if filename != "" {
+				jsonencoder(jsoninterface, filename)
+				fmt.Printf("outputting %s.json to file...\n", filename)
+
+			}
 		}
 	},
 }
@@ -61,7 +66,20 @@ var Headers = map[string]string{
 	"CSVLabelHeader":     api.CSVLabelHeader,
 }
 
-func getJSONData(headerType string, structureID string) {
+func jsonencoder(jsonoutput interface{}, filename string) {
+	file, err := os.Create(string(filename + ".json"))
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(jsonoutput); err != nil {
+		panic(err)
+	}
+}
+
+func getJSONData(headerType string, structureID string) interface{} {
 	client := &http.Client{}
 
 	header := Headers[headerType]
@@ -84,6 +102,10 @@ func getJSONData(headerType string, structureID string) {
 
 	defer response.Body.Close()
 
+	//var bodyBytes []byte
+
+	var result interface{}
+
 	// create structs for JSON responses
 	if response.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(response.Body)
@@ -91,7 +113,7 @@ func getJSONData(headerType string, structureID string) {
 			log.Fatal(err)
 		}
 
-		var result interface{}
+		print(bodyBytes[:])
 
 		json.Unmarshal(bodyBytes, &result)
 
@@ -100,6 +122,7 @@ func getJSONData(headerType string, structureID string) {
 		myString := string(bodyBytes[:])
 		fmt.Println(myString)
 	}
+	return result
 }
 
 func getCSVData(headerType string, structureID string) []byte {
@@ -127,7 +150,6 @@ func getCSVData(headerType string, structureID string) []byte {
 
 	var bodyBytes []byte
 
-	// create structs for JSON responses
 	if response.StatusCode == http.StatusOK {
 		bodyBytes, err = io.ReadAll(response.Body)
 		if err != nil {
