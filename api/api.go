@@ -17,3 +17,7 @@ var JSONHeader string = "application/vnd.sdmx.data+json"
 var CSVHeader string = "application/vnd.sdmx.data+csv"
 
 var CSVLabelHeader string = "application/vnd.sdmx.data+csv;labels=both"
+
+var Datastructure string = "https://data.api.abs.gov.au/rest/datastructure/ABS/"
+
+var Codelist string = "?references=codelist"

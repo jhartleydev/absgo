@@ -40,29 +40,6 @@ func init() {
 
 	ListDataflowCmd.PersistentFlags().String("desc", "", "Describe a specific Dataflow Item")
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// ListDataflowCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// ListDataflowCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-type DataflowStruct struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
-type Data struct {
-	Dataflows []DataflowStruct `json:"dataflows"`
-}
-
-type Root struct {
-	Data Data `json:"data"`
 }
 
 func getDataflowItems() {
