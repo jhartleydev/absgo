@@ -29,13 +29,14 @@ to quickly create a Cobra application.`,
 		headerType, _ := cmd.Flags().GetString("header")
 		structureID, _ := cmd.Flags().GetString("structureID")
 		filename, _ := cmd.Flags().GetString("filename")
+		dataKey, _ := cmd.Flags().GetString("datakey")
 
 		if headerType == "" {
 			log.Fatal("no header")
 		} else if structureID == "" {
 			log.Fatal("no structure ID")
 		} else if headerType[0:3] == "CSV" {
-			csvbytes := getCSVData(headerType, structureID)
+			csvbytes := getCSVData(headerType, structureID, dataKey)
 			if filename != "" {
 				os.WriteFile(filename+".csv", csvbytes, 0644)
 				fmt.Printf("outputting %s.csv to file...\n", filename)
@@ -57,6 +58,7 @@ func init() {
 	GetDataCmd.PersistentFlags().String("header", "", "add a header to the get request")
 	GetDataCmd.PersistentFlags().String("structureID", "", "add a structure ID to the request")
 	GetDataCmd.PersistentFlags().String("filename", "", "output to file")
+	GetDataCmd.PersistentFlags().String("datakey", "", "value of data key")
 }
 
 var Headers = map[string]string{
@@ -125,12 +127,12 @@ func getJSONData(headerType string, structureID string) interface{} {
 	return result
 }
 
-func getCSVData(headerType string, structureID string) []byte {
+func getCSVData(headerType string, structureID string, dataKey string) []byte {
 	client := &http.Client{}
 
 	var header string = Headers[headerType]
 
-	var getURL string = api.Base_url + api.DataURL + "," + structureID + ",1.0.0"
+	var getURL string = api.Base_url + api.DataURL + "," + structureID + ",1.0.0/" + dataKey
 
 	fmt.Println(getURL)
 

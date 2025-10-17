@@ -9,6 +9,7 @@ type DataflowStruct struct {
 type Data struct {
 	Dataflows      []DataflowStruct `json:"dataflows"`
 	DataStructures []DataStructure  `json:"datastructures"`
+	Codelists      []Codelist       `json:"codelists"`
 }
 
 type Root struct {
@@ -42,4 +43,21 @@ type AttributeList struct {
 
 type Attribute struct {
 	Id string `json:"id"`
+}
+
+type Codelist struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Codes []Code `json:"codes"`
+}
+
+type Code struct {
+	Id          string       `json:"id"`
+	Name        string       `json:"name"`
+	Annotations []Annotation `json:"annotations"`
+}
+
+type Annotation struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
 }
