@@ -17,13 +17,14 @@ import (
 // ListDataflowCmd represents the ListDataflow command
 var ListDataflowCmd = &cobra.Command{
 	Use:   "ListDataflow",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Lists available dataflows",
+	Long: `Lists all available dataflows, unless using the desc flag, which takes a dataflow ID 
+and provides a specific description of that dataflow, such as:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+absgo ListDataflow --desc WPI
+
+Which returns details on the wage price index.
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		descTerm, _ := cmd.Flags().GetString("desc")
 
@@ -44,8 +45,6 @@ func init() {
 
 func getDataflowItems() {
 	client := &http.Client{}
-
-	// fmt.Println("ListDataflow called")
 
 	getURL := api.Base_url + api.DataflowURL
 

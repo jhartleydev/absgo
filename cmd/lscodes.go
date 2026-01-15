@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -17,11 +14,13 @@ import (
 // lscodesCmd represents the lscodes command
 var lscodesCmd = &cobra.Command{
 	Use:   "lscodes",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Lists codes for a dataflow",
+	Long: `Takes a single dataflow id as an argument following the "dataflow" flag, and returns a codelist of available codes 
+	for further querying. For example:
 
-This command will reference the API datastructure, and return a list of dimensions from the codelist`,
+usage: absgo lscodes --dataflow WPI
+
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dataflow, _ := cmd.Flags().GetString("dataflow")
 

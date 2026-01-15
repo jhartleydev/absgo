@@ -18,9 +18,22 @@ import (
 // GetDataCmd represents the GetData command
 var GetDataCmd = &cobra.Command{
 	Use:   "GetData",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Retrieve data based on datastructure, header type and data key",
+	Long: `Using the flags 'header', 'structureid', 'filename' and 'datakey', returns
+data based on the following filters. the Header flag takes one of the following values:
+
+XmlStructureHeader - returns xml format
+JSONHeader - returns json format
+CSVHeader - returns csv format
+CSVLabelHeader - returns csv format with more detailed labels
+
+The 'filename' flag takes the desired name of the file, without the file extension. This is 
+inferred by the header type. This is an optional flag; if not provided, the results of the
+command are printed to the terminal.
+
+For example:
+
+usage: absgo GetData --header 
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
