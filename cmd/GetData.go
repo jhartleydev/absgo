@@ -31,13 +31,14 @@ The 'filename' flag takes the desired name of the file, without the file extensi
 inferred by the header type. This is an optional flag; if not provided, the results of the
 command are printed to the terminal.
 
+The Datakey is made by selecting each dimensions value that is desired to be returned.
+
 For example:
 
-usage: absgo GetData --header 
+usage: absgo GetData --header [header] --structureID [structureID] --filename [filename OPTIONAL] 
+--datakey [datakey]
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		headerType, _ := cmd.Flags().GetString("header")
 		structureID, _ := cmd.Flags().GetString("structureID")
