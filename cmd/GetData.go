@@ -17,7 +17,7 @@ import (
 
 // GetDataCmd represents the GetData command
 var GetDataCmd = &cobra.Command{
-	Use:   "GetData",
+	Use:   "getdata",
 	Short: "Retrieve data based on datastructure, header type and data key",
 	Long: `Using the flags 'header', 'structureid', 'filename' and 'datakey', returns
 data based on the following filters. the Header flag takes one of the following values:
@@ -31,7 +31,8 @@ The 'filename' flag takes the desired name of the file, without the file extensi
 inferred by the header type. This is an optional flag; if not provided, the results of the
 command are printed to the terminal.
 
-The Datakey is made by selecting each dimensions value that is desired to be returned.
+The Datakey is made by selecting each dimensions value that is desired to be returned. Encase the datakey in
+quotation marks.
 
 For example:
 
@@ -41,7 +42,7 @@ usage: absgo GetData --header [header] --structureID [structureID] --filename [f
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		headerType, _ := cmd.Flags().GetString("header")
-		structureID, _ := cmd.Flags().GetString("structureID")
+		structureID, _ := cmd.Flags().GetString("structureid")
 		filename, _ := cmd.Flags().GetString("filename")
 		dataKey, _ := cmd.Flags().GetString("datakey")
 
@@ -49,13 +50,13 @@ usage: absgo GetData --header [header] --structureID [structureID] --filename [f
 			log.Fatal("no header")
 		} else if structureID == "" {
 			log.Fatal("no structure ID")
-		} else if headerType[0:3] == "CSV" {
+		} else if headerType[0:3] == "csv" {
 			csvbytes := getCSVData(headerType, structureID, dataKey)
 			if filename != "" {
 				os.WriteFile(filename+".csv", csvbytes, 0644)
 				fmt.Printf("outputting %s.csv to file...\n", filename)
 			}
-		} else if headerType == "JSONHeader" {
+		} else if headerType == "jsonheader" {
 			jsoninterface := getJSONData(headerType, structureID)
 			if filename != "" {
 				jsonencoder(jsoninterface, filename)
@@ -69,17 +70,18 @@ usage: absgo GetData --header [header] --structureID [structureID] --filename [f
 func init() {
 	rootCmd.AddCommand(GetDataCmd)
 
-	GetDataCmd.PersistentFlags().String("header", "", "add a header to the get request")
-	GetDataCmd.PersistentFlags().String("structureID", "", "add a structure ID to the request")
-	GetDataCmd.PersistentFlags().String("filename", "", "output to file")
-	GetDataCmd.PersistentFlags().String("datakey", "", "value of data key")
+	GetDataCmd.PersistentFlags().StringP("header", "e", "", "add a header to the get request")
+	GetDataCmd.PersistentFlags().StringP("structureid", "s", "", "add a structure ID to the request")
+	GetDataCmd.PersistentFlags().StringP("filename", "f", "", "output to file")
+	GetDataCmd.PersistentFlags().StringP("datakey", "d", "", "value of data key")
+
 }
 
 var Headers = map[string]string{
-	"XmlStructureHeader": api.XmlStructureHeader,
-	"JSONHeader":         api.JSONHeader,
-	"CSVHeader":          api.CSVHeader,
-	"CSVLabelHeader":     api.CSVLabelHeader,
+	"xmlstructureheader": api.XmlStructureHeader,
+	"jsonheader":         api.JSONHeader,
+	"csvheader":          api.CSVHeader,
+	"csvlabelheader":     api.CSVLabelHeader,
 }
 
 func jsonencoder(jsonoutput interface{}, filename string) {

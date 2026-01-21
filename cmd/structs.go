@@ -28,7 +28,14 @@ type DsComponents struct {
 }
 
 type DimList struct {
-	Dimensions []Dimension `json:"dimensions"`
+	Dimensions     []Dimension     `json:"dimensions"`
+	TimeDimensions []TimeDimension `json:"timedimensions"`
+}
+
+type TimeDimension struct {
+	Id       string `json:"id"`
+	Position int    `json:"position"`
+	Type     string `json:"type"`
 }
 
 type Dimension struct {
